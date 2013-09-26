@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <limits>
 
 using namespace std;
 
@@ -19,11 +19,13 @@ class BST{
   
   void printInHelper(struct node<T> *root);
   T inorderSuccessorHelper(struct node<T> *root, T, bool&);
+  bool checkBSTHelper(struct node<T> *root, T min, T max);
 
   public:
     void insert(T);
     void printInOrder();
     T findInorderSuccessor(T);
+    bool checkBST();
 
     BST(){
       this->root = NULL;
@@ -129,6 +131,30 @@ T BST<T>::findInorderSuccessor(T input) {
   return -1;
 }
 
+template <class T>
+bool BST<T>::checkBSTHelper(struct node<T> *root, T min, T max) {
+  if(root == NULL) return true;
+
+  bool isBST = (root->data < max) && (root->data >= min);
+
+  if(isBST) {
+    isBST = checkBSTHelper(root->left, min, root->data);
+    if(isBST) {
+      checkBSTHelper(root->right, root->data, max);
+    }
+  }
+  return isBST;
+}
+
+template <class T>
+bool BST<T>::checkBST() {
+
+  T min = numeric_limits<T>::min();
+  T max = numeric_limits<T>::max();
+  return checkBSTHelper(root, min, max);
+
+}
+
 
 int main() {
   BST<int> mytree;
@@ -143,6 +169,10 @@ int main() {
   cout<<mytree.findInorderSuccessor(3)<<endl;
   cout<<mytree.findInorderSuccessor(8)<<endl;
   cout<<mytree.findInorderSuccessor(6)<<endl;
-
+  if(mytree.checkBST()) {
+    cout<<"true\n";
+  } else {
+    cout<<"false\n";
+  }
   return 0;
 }
