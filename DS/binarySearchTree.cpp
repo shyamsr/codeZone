@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <stack>
 
 using namespace std;
 
@@ -86,23 +87,17 @@ void BST<T>::printInHelper(struct node<T> *root) {
 
 template <class T>
 T BST<T>::findInorderSuccessor(T input) {
-  struct node<T> *pred_1=NULL;
-  struct node<T> *pred_2=NULL;
   struct node<T> *curr=root;
+  stack<T> succ;
 
   while(curr!=NULL) {
     if(input == curr->data) break;
 
-    if(pred_1==NULL&&pred_2==NULL) {
-      pred_1 = curr;
-    } else {
-      pred_2=pred_1;
-      pred_1=curr;
-    }
-
     if(input > curr->data) {
+      succ.push(curr->data);
       curr = curr->right;
     } else if(input < curr->data) {
+      succ.push(curr->data);
       curr = curr->left;
     }
 
@@ -120,12 +115,13 @@ T BST<T>::findInorderSuccessor(T input) {
       curr=curr->left;
     }
     return temp->data;
-  } else if(pred_1 == NULL) {
-    return -1;
-  } else if(pred_1->left==curr) {
-    return pred_1->data;
-  } else if(pred_2 !=NULL && pred_2->data >input) {
-    return pred_2->data;
+  } else {
+    while(! succ.empty()) {
+      if(succ.top() > input) {
+        return succ.top();
+      }
+      succ.pop();
+    }
   }
   
   return -1;
@@ -165,10 +161,10 @@ int main() {
   mytree.insert(6);
   mytree.insert(15);
   mytree.printInOrder();
-  cout<<mytree.findInorderSuccessor(15)<<endl;
   cout<<mytree.findInorderSuccessor(3)<<endl;
-  cout<<mytree.findInorderSuccessor(8)<<endl;
   cout<<mytree.findInorderSuccessor(6)<<endl;
+  cout<<mytree.findInorderSuccessor(8)<<endl;
+  cout<<mytree.findInorderSuccessor(9)<<endl;
   if(mytree.checkBST()) {
     cout<<"true\n";
   } else {
